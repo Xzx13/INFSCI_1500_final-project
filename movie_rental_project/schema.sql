@@ -14,7 +14,7 @@ CREATE TABLE customer (
     signup_date DATE NOT NULL
 ) ENGINE=InnoDB;
 
--- 2. MOVIE
+-- 2. MOVIE 
 CREATE TABLE movie (
     movie_id       INT AUTO_INCREMENT PRIMARY KEY,
     title          VARCHAR(200) NOT NULL,
@@ -22,7 +22,9 @@ CREATE TABLE movie (
     mpaa_rating    VARCHAR(10),
     length_minutes INT,
     movie_rating   DECIMAL(3,1),
-    description    TEXT
+    description    TEXT,
+    rental_rate    DECIMAL(4,2) NOT NULL DEFAULT 4.99, 
+    late_fee       DECIMAL(4,2) NOT NULL DEFAULT 1.00 
 ) ENGINE=InnoDB;
 
 -- 3. CATEGORY
@@ -103,11 +105,11 @@ INSERT INTO customer (first_name, last_name, email, phone, address, signup_date)
 ('Alice', 'Johnson', 'alice@example.com', '412-111-2222', '123 Main St', '2024-01-01'),
 ('Bob',   'Lee',     'bob@example.com',   '412-333-4444', '456 Oak Ave', '2024-02-10');
 
--- Movies
-INSERT INTO movie (title, release_year, mpaa_rating, length_minutes, movie_rating, description) VALUES
-('The Matrix', 1999, 'R',     136, 8.7, 'A hacker discovers reality is a simulation.'),
-('Inception',  2010, 'PG-13', 148, 8.8, 'A thief enters dreams to steal secrets.'),
-('Toy Story',  1995, 'G',      81, 8.3, 'Animated toys come to life.');
+-- Movies (Prices included here)
+INSERT INTO movie (title, release_year, mpaa_rating, length_minutes, movie_rating, description, rental_rate, late_fee) VALUES
+('The Matrix', 1999, 'R',     136, 8.7, 'A hacker discovers reality is a simulation.', 4.99, 1.00),
+('Inception',  2010, 'PG-13', 148, 8.8, 'A thief enters dreams to steal secrets.',     5.99, 2.00),
+('Toy Story',  1995, 'G',      81, 8.3, 'Animated toys come to life.',                 2.99, 0.50);
 
 -- Categories
 INSERT INTO category (category_name) VALUES
@@ -153,3 +155,15 @@ VALUES
 (2, 3, '2025-10-20 14:00:00', '2025-10-25 14:00:00', 'RETURNED');
 
 UPDATE inventory_copy SET status = 'RENTED' WHERE copy_id = 1;
+
+-- Overdue rental for testing
+INSERT INTO rental (customer_id, copy_id, rental_date, due_date, rental_status)
+VALUES (
+    1,
+    2,
+    DATE_SUB(NOW(), INTERVAL 10 DAY),
+    DATE_SUB(NOW(), INTERVAL 5 DAY),
+    'OPEN'
+);
+
+UPDATE inventory_copy SET status = 'RENTED' WHERE copy_id = 2;
