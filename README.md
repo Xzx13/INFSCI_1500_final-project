@@ -125,9 +125,9 @@ These could be added but we ran out of time 😅
 
 ## Division of Work
 
-- **Zach:** ER diagram, relational schema, testing documentation
-- **Zhexi:** DDL statements, SQL queries
-- **Hangting:** Frontend code, system overview, implementation sections
+- **Zach:** ER diagram, relational schema, testing documentation (report section 3, 4, and 5) 
+- **Zhexi:** DDL statements, SQL queries (report section 2, 8, and 9) 
+- **Hangting:** Frontend code, system overview, implementation sections (report section 1, 6, and 7)
 
 ---
 
