@@ -3,7 +3,7 @@
 INFSCI 1500 Database Management - Final Project  
 Fall 2025
 
-**Team Members:** Zachary Renaud, Hangting Zhu, Zhexi Xu
+**Team Members:** Zachary Renaud (zlr10@pitt.edu), Hangting Zhu (haz126@pitt.edu), Zhexi Xu (zhx77@pitt.edu)
 
 ---
 
@@ -145,4 +145,4 @@ The `init_db()` function will recreate everything with sample data.
 
 ## Questions?
 
-Feel free to reach out to any of us or check the final report for more details.
+Feel free to reach out to any of us or check the final report for more details. (see contact information above)
