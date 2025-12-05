@@ -119,7 +119,7 @@ The system comes pre-loaded with:
 - Payment processing is basic - no actual payment gateway
 - No late fee calculation in the web interface
 
-These could be added in future versions but we ran out of time 😅
+These could be added but we ran out of time 😅
 
 ---
 
