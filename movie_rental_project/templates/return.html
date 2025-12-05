@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}Return a Movie - Movie Rental System{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="container">
+        <h1><i class="bi bi-box-arrow-in-left"></i> Return a Movie</h1>
+        <p class="mb-0">Process movie returns</p>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row">
+        <!-- Return Form -->
+        <div class="col-lg-5 mb-4">
+            <div class="card">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="bi bi-arrow-return-left"></i> Process Return</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('return_movie') }}">
+                        <div class="mb-4">
+                            <label for="rental_id" class="form-label">
+                                <i class="bi bi-receipt"></i> Rental ID <span class="text-danger">*</span>
+                            </label>
+                            <input type="number" class="form-control form-control-lg" 
+                                   id="rental_id" name="rental_id" 
+                                   placeholder="Enter rental ID" required min="1">
+                            <div class="form-text">Enter the rental ID from the active rentals list.</div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-warning btn-lg">
+                                <i class="bi bi-check-circle"></i> Process Return
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Help Info -->
+            <div class="card mt-4">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="bi bi-info-circle"></i> Return Policy</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="mb-0">
+                        <li>Movies are due 5 days after rental</li>
+                        <li>Late returns will incur daily late fees</li>
+                        <li>The copy will be marked as available after return</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Active Rentals List -->
+        <div class="col-lg-7">
+            <div class="card">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-list-ul"></i> Active Rentals</h5>
+                    <span class="badge bg-primary">{{ rentals|length }} open</span>
+                </div>
+                <div class="card-body p-0">
+                    {% if rentals %}
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Rental ID</th>
+                                    <th>Customer</th>
+                                    <th>Movie</th>
+                                    <th>Rental Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for rental in rentals %}
+                                <tr>
+                                    <td>
+                                        <span class="badge bg-primary fs-6">{{ rental['rental_id'] }}</span>
+                                    </td>
+                                    <td>
+                                        <i class="bi bi-person"></i>
+                                        {{ rental['first_name'] }} {{ rental['last_name'] }}
+                                    </td>
+                                    <td>
+                                        <i class="bi bi-film"></i>
+                                        {{ rental['title'] }}
+                                    </td>
+                                    <td>
+                                        <i class="bi bi-calendar"></i>
+                                        {{ rental['rental_date'][:10] }}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="bi bi-inbox text-muted" style="font-size: 3rem;"></i>
+                        <h5 class="mt-3 text-muted">No Active Rentals</h5>
+                        <p class="text-muted mb-0">All movies have been returned.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

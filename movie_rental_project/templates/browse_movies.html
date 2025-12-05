@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}Browse Movies - Movie Rental System{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="container">
+        <h1><i class="bi bi-collection-play"></i> Browse Movies</h1>
+        <p class="mb-0">Search and explore our movie catalog</p>
+    </div>
+</div>
+
+<div class="container">
+    <!-- Search Form -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="GET" action="{{ url_for('browse_movies') }}" class="row g-3">
+                <div class="col-md-10">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-search"></i></span>
+                        <input type="text" class="form-control form-control-lg" name="keyword" 
+                               placeholder="Search by movie title..." value="{{ keyword }}">
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary btn-lg w-100">Search</button>
+                </div>
+            </form>
+            {% if keyword %}
+            <div class="mt-3">
+                <span class="text-muted">Showing results for: <strong>"{{ keyword }}"</strong></span>
+                <a href="{{ url_for('browse_movies') }}" class="btn btn-sm btn-outline-secondary ms-2">Clear</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Results Count -->
+    <p class="text-muted mb-3">
+        <i class="bi bi-info-circle"></i> Found <strong>{{ movies|length }}</strong> movie(s)
+    </p>
+
+    <!-- Movies Grid -->
+    {% if movies %}
+    <div class="row g-4">
+        {% for movie in movies %}
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h5 class="card-title mb-0">{{ movie['title'] }}</h5>
+                        {% if movie['mpaa_rating'] %}
+                        <span class="badge bg-secondary">{{ movie['mpaa_rating'] }}</span>
+                        {% endif %}
+                    </div>
+                    <p class="text-muted mb-3">
+                        <i class="bi bi-calendar"></i> {{ movie['release_year'] if movie['release_year'] else 'N/A' }}
+                    </p>
+                    <a href="{{ url_for('movie_detail', movie_id=movie['movie_id']) }}" class="btn btn-outline-primary">
+                        <i class="bi bi-eye"></i> View Details
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+        <i class="bi bi-film text-muted" style="font-size: 4rem;"></i>
+        <h4 class="mt-3 text-muted">No movies found</h4>
+        <p class="text-muted">Try a different search term or browse all movies</p>
+        {% if keyword %}
+        <a href="{{ url_for('browse_movies') }}" class="btn btn-primary">Browse All Movies</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
