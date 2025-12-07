@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+
+{% block title %}Rent a Movie - Movie Rental System{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="container">
+        <h1><i class="bi bi-box-arrow-right"></i> Rent a Movie</h1>
+        <p class="mb-0">Process a new rental transaction</p>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="bi bi-plus-circle"></i> New Rental</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('rent_movie') }}">
+                        <!-- Customer Selection -->
+                        <div class="mb-4">
+                            <label for="customer_id" class="form-label">
+                                <i class="bi bi-person"></i> Select Customer <span class="text-danger">*</span>
+                            </label>
+                            <select class="form-select form-select-lg" id="customer_id" name="customer_id" required>
+                                <option value="" disabled selected>-- Choose a customer --</option>
+                                <option value="new">+ New customer...</option>
+                                {% for customer in customers %}
+                                <option value="{{ customer['customer_id'] }}">
+                                    {{ customer['name'] }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                            <div class="form-text">
+                                Pick an existing customer, or choose "New customer..." to register a new one.
+                            </div>
+                        </div>
+
+                        <!-- New Customer Fields (hidden by default) -->
+                        <div id="new-customer-fields" class="mb-4" style="display: none;">
+                            <div class="alert alert-secondary py-2 mb-3">
+                                <i class="bi bi-person-plus"></i>
+                                New customer details
+                            </div>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="new_first_name" class="form-label">First name <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="new_first_name" name="new_first_name" placeholder="First name">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="new_last_name" class="form-label">Last name <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="new_last_name" name="new_last_name" placeholder="Last name">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="new_email" class="form-label">Email <span class="text-danger">*</span></label>
+                                    <input type="email" class="form-control" id="new_email" name="new_email" placeholder="email@example.com">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="new_phone" class="form-label">Phone</label>
+                                    <input type="text" class="form-control" id="new_phone" name="new_phone" placeholder="Optional phone number">
+                                </div>
+                                <div class="col-12">
+                                    <label for="new_address" class="form-label">Address</label>
+                                    <input type="text" class="form-control" id="new_address" name="new_address" placeholder="Street, city, etc.">
+                                </div>
+                            </div>
+                            <div class="form-text mt-1">
+                                These fields are only required when you choose "New customer...".
+                            </div>
+                        </div>
+
+                        <!-- Movie Selection -->
+                        <div class="mb-4">
+                            <label for="movie_id" class="form-label">
+                                <i class="bi bi-film"></i> Select Movie <span class="text-danger">*</span>
+                            </label>
+                            <select class="form-select form-select-lg" id="movie_id" name="movie_id" required>
+                                <option value="" disabled selected>-- Choose a movie --</option>
+                                {% for movie in movies %}
+                                <option value="{{ movie['movie_id'] }}">
+                                    {{ movie['title'] }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                            <div class="form-text">Select the movie to rent. The system will check availability automatically.</div>
+                        </div>
+
+                        <!-- Rental Info -->
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle"></i>
+                            <strong>Rental Policy:</strong> The due date will be automatically set to 5 days from today. 
+                            Late returns will incur additional fees.
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-check-circle"></i> Process Rental
+                            </button>
+                            <a href="{{ url_for('browse_movies') }}" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Help Card -->
+            <div class="card mt-4">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="bi bi-question-circle"></i> Need Help?</h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-2"><strong>How to process a rental:</strong></p>
+                    <ol class="mb-0">
+                        <li>Select the customer or choose "New customer..."</li>
+                        <li>Fill in new customer info if needed</li>
+                        <li>Choose the movie the customer wants to rent</li>
+                        <li>Click "Process Rental" to complete the transaction</li>
+                        <li>The system will automatically assign an available copy and update inventory</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Simple JS to toggle new customer fields -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const customerSelect = document.getElementById("customer_id");
+    const newFields = document.getElementById("new-customer-fields");
+    const first = document.getElementById("new_first_name");
+    const last = document.getElementById("new_last_name");
+    const email = document.getElementById("new_email");
+
+    if (!customerSelect || !newFields) return;
+
+    function toggleNewCustomer() {
+        if (customerSelect.value === "new") {
+            newFields.style.display = "block";
+            if (first) first.required = true;
+            if (last) last.required = true;
+            if (email) email.required = true;
+        } else {
+            newFields.style.display = "none";
+            if (first) first.required = false;
+            if (last) last.required = false;
+            if (email) email.required = false;
+        }
+    }
+
+    customerSelect.addEventListener("change", toggleNewCustomer);
+    // run once on load
+    toggleNewCustomer();
+});
+</script>
+{% endblock %}
