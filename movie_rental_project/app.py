@@ -10,9 +10,12 @@ app.secret_key = "change_this_secret_key"
 DB_PATH = os.path.join(os.path.dirname(__file__), "movierental.db")
 
 def get_connection():
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row  # let us use row["column_name"]
+    conn = sqlite3.connect(DB_PATH, timeout=10)
+    conn.row_factory = sqlite3.Row
+    conn.execute("PRAGMA busy_timeout = 5000;")
+    conn.execute("PRAGMA foreign_keys = ON;")
     return conn
+
 
 def init_db():
     """Create tables and sample data if database is empty."""
@@ -303,32 +306,99 @@ def home():
 
 @app.route("/movies")
 def browse_movies():
-    keyword = request.args.get("keyword", "")
+    keyword = request.args.get("keyword", "").strip()
+    category_id = request.args.get("category_id", "").strip()
+    year = request.args.get("year", "").strip()
+    min_rating = request.args.get("min_rating", "").strip()
+    sort_by = request.args.get("sort_by", "title")
+    sort_dir = request.args.get("sort_dir", "asc")
+
     conn = get_connection()
     cur = conn.cursor()
 
-    if keyword:
-        cur.execute(
-            """
-            SELECT movie_id, title, release_year, mpaa_rating
-            FROM movie
-            WHERE title LIKE ?
-            ORDER BY title;
-            """,
-            (f"%{keyword}%",),
-        )
-    else:
-        cur.execute(
-            """
-            SELECT movie_id, title, release_year, mpaa_rating
-            FROM movie
-            ORDER BY title;
-            """
-        )
+    cur.execute("SELECT category_id, category_name FROM category ORDER BY category_name;")
+    categories = cur.fetchall()
 
+    cur.execute(
+        """
+        SELECT DISTINCT release_year
+        FROM movie
+        WHERE release_year IS NOT NULL
+        ORDER BY release_year DESC;
+        """
+    )
+    years = [row["release_year"] for row in cur.fetchall()]
+
+    base_query = """
+        SELECT
+            m.movie_id,
+            m.title,
+            m.release_year,
+            m.mpaa_rating,
+            m.movie_rating,
+            GROUP_CONCAT(DISTINCT c.category_name) AS categories
+        FROM movie m
+        LEFT JOIN movie_category mc ON m.movie_id = mc.movie_id
+        LEFT JOIN category c ON mc.category_id = c.category_id
+    """
+
+    conditions = []
+    params = []
+
+    if keyword:
+        conditions.append("m.title LIKE ?")
+        params.append(f"%{keyword}%")
+
+    if category_id:
+        conditions.append("c.category_id = ?")
+        params.append(category_id)
+
+    if year:
+        conditions.append("m.release_year = ?")
+        params.append(year)
+
+    if min_rating:
+        conditions.append("m.movie_rating >= ?")
+        params.append(min_rating)
+
+    if conditions:
+        base_query += " WHERE " + " AND ".join(conditions)
+
+    base_query += """
+        GROUP BY
+            m.movie_id,
+            m.title,
+            m.release_year,
+            m.mpaa_rating,
+            m.movie_rating
+    """
+
+    sort_map = {
+        "title": "m.title",
+        "year": "m.release_year",
+        "rating": "m.movie_rating",
+    }
+    order_col = sort_map.get(sort_by, "m.title")
+    order_dir = "DESC" if sort_dir == "desc" else "ASC"
+    base_query += f" ORDER BY {order_col} {order_dir};"
+
+    cur.execute(base_query, params)
     movies = cur.fetchall()
     conn.close()
-    return render_template("browse_movies.html", movies=movies, keyword=keyword)
+
+    return render_template(
+        "browse_movies.html",
+        movies=movies,
+        keyword=keyword,
+        categories=categories,
+        years=years,
+        selected_category=category_id,
+        selected_year=year,
+        selected_min_rating=min_rating,
+        sort_by=sort_by,
+        sort_dir=sort_dir,
+    )
+
 
 @app.route("/movies/<int:movie_id>")
 def movie_detail(movie_id):
@@ -370,7 +440,43 @@ def rent_movie():
         customer_id = request.form.get("customer_id")
         movie_id = request.form.get("movie_id")
 
-        # find an available copy
+    
+        if customer_id == "new":
+            first_name = (request.form.get("new_first_name") or "").strip()
+            last_name = (request.form.get("new_last_name") or "").strip()
+            email = (request.form.get("new_email") or "").strip()
+            phone = (request.form.get("new_phone") or "").strip()
+            address = (request.form.get("new_address") or "").strip()
+
+            if not first_name or not last_name or not email:
+                flash("Please fill in first name, last name, and email for the new customer.", "error")
+
+            
+                cur.execute("SELECT movie_id, title FROM movie ORDER BY title")
+                movies = cur.fetchall()
+                cur.execute(
+                    """
+                    SELECT customer_id,
+                           first_name || ' ' || last_name AS name
+                    FROM customer
+                    ORDER BY last_name, first_name
+                    """
+                )
+                customers = cur.fetchall()
+                conn.close()
+                return render_template("rent.html", movies=movies, customers=customers)
+
+        
+            cur.execute(
+                """
+                INSERT INTO customer (first_name, last_name, email, phone, address, signup_date)
+                VALUES (?, ?, ?, ?, ?, DATE('now'))
+                """,
+                (first_name, last_name, email, phone, address),
+            )
+            customer_id = cur.lastrowid 
+
+    
         cur.execute(
             """
             SELECT copy_id
@@ -389,6 +495,7 @@ def rent_movie():
             rental_date = datetime.now()
             due_date = rental_date + timedelta(days=5)
 
+        
             cur.execute(
                 """
                 INSERT INTO rental (customer_id, copy_id, rental_date, due_date, rental_status)
@@ -402,6 +509,7 @@ def rent_movie():
                 ),
             )
 
+        
             cur.execute(
                 """
                 UPDATE inventory_copy
@@ -433,6 +541,7 @@ def rent_movie():
 
     conn.close()
     return render_template("rent.html", movies=movies, customers=customers)
+
 
 @app.route("/return", methods=["GET", "POST"])
 def return_movie():
