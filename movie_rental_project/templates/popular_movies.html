@@ -1,0 +1,273 @@
+{% extends "base.html" %}
+
+{% block title %}Popular Movies Report - Movie Rental System{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="container">
+        <h1><i class="bi bi-graph-up"></i> Reports</h1>
+        <p class="mb-0">Analytics and business insights</p>
+    </div>
+</div>
+
+<div class="container">
+    <!-- Summary Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <i class="bi bi-collection-play text-primary" style="font-size: 2rem;"></i>
+                    <h3 class="mt-2 mb-0">{{ total_movies }}</h3>
+                    <small class="text-muted">Total Movies</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <i class="bi bi-people text-success" style="font-size: 2rem;"></i>
+                    <h3 class="mt-2 mb-0">{{ total_customers }}</h3>
+                    <small class="text-muted">Total Customers</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <i class="bi bi-receipt text-warning" style="font-size: 2rem;"></i>
+                    <h3 class="mt-2 mb-0">{{ total_rentals }}</h3>
+                    <small class="text-muted">Total Rentals</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <i class="bi bi-hourglass-split text-danger" style="font-size: 2rem;"></i>
+                    <h3 class="mt-2 mb-0">{{ active_rentals }}</h3>
+                    <small class="text-muted">Active Rentals</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Average Statistics Section -->
+    <div class="card mb-4">
+        <div class="card-header bg-white">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h5 class="mb-0"><i class="bi bi-calculator text-info"></i> Average Statistics</h5>
+                </div>
+                <div class="col-auto">
+                    <span class="badge bg-success">
+                        <i class="bi bi-check-circle"></i> AVG() Aggregation
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4 col-sm-6 mb-3">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-primary bg-opacity-10 rounded-circle p-3 me-3">
+                            <i class="bi bi-clock text-primary" style="font-size: 1.5rem;"></i>
+                        </div>
+                        <div>
+                            <h4 class="mb-0">{{ avg_rental_duration }} <small class="text-muted fs-6">days</small></h4>
+                            <small class="text-muted">Avg. Rental Duration</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 mb-3">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-success bg-opacity-10 rounded-circle p-3 me-3">
+                            <i class="bi bi-currency-dollar text-success" style="font-size: 1.5rem;"></i>
+                        </div>
+                        <div>
+                            <h4 class="mb-0">${{ avg_rental_rate }}</h4>
+                            <small class="text-muted">Avg. Rental Rate</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 mb-3">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-warning bg-opacity-10 rounded-circle p-3 me-3">
+                            <i class="bi bi-person-check text-warning" style="font-size: 1.5rem;"></i>
+                        </div>
+                        <div>
+                            <h4 class="mb-0">{{ avg_rentals_per_customer }}</h4>
+                            <small class="text-muted">Avg. Rentals per Customer</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 mb-3">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-danger bg-opacity-10 rounded-circle p-3 me-3">
+                            <i class="bi bi-star text-danger" style="font-size: 1.5rem;"></i>
+                        </div>
+                        <div>
+                            <h4 class="mb-0">{{ avg_movie_rating }} <small class="text-muted fs-6">/ 10</small></h4>
+                            <small class="text-muted">Avg. Movie Rating</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 mb-3">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-info bg-opacity-10 rounded-circle p-3 me-3">
+                            <i class="bi bi-box-seam text-info" style="font-size: 1.5rem;"></i>
+                        </div>
+                        <div>
+                            <h4 class="mb-0">{{ avg_copies_per_movie }}</h4>
+                            <small class="text-muted">Avg. Copies per Movie</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 mb-3">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-secondary bg-opacity-10 rounded-circle p-3 me-3">
+                            <i class="bi bi-credit-card text-secondary" style="font-size: 1.5rem;"></i>
+                        </div>
+                        <div>
+                            <h4 class="mb-0">${{ avg_payment_amount }}</h4>
+                            <small class="text-muted">Avg. Payment Amount</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Report Header -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h4 class="mb-1"><i class="bi bi-trophy text-warning"></i> Top Rented Movies</h4>
+                    <p class="text-muted mb-0">Most popular movies based on rental count</p>
+                </div>
+                <div class="col-md-4 text-md-end">
+                    <span class="badge bg-info fs-6">
+                        <i class="bi bi-bar-chart"></i> Aggregation Report
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if movies %}
+    <!-- Top 3 Podium -->
+    {% if movies|length >= 3 %}
+    <div class="row mb-4 justify-content-center">
+        <!-- 2nd Place -->
+        <div class="col-md-3 order-md-1 order-2">
+            <div class="card text-center h-100" style="margin-top: 2rem;">
+                <div class="card-body">
+                    <div class="display-4 mb-2">🥈</div>
+                    <h5>{{ movies[1]['title'] }}</h5>
+                    <p class="display-6 fw-bold text-primary mb-0">{{ movies[1]['rental_count'] }}</p>
+                    <small class="text-muted">rentals</small>
+                </div>
+            </div>
+        </div>
+        <!-- 1st Place -->
+        <div class="col-md-3 order-md-2 order-1">
+            <div class="card text-center h-100 border-warning" style="border-width: 2px;">
+                <div class="card-body">
+                    <div class="display-3 mb-2">🥇</div>
+                    <h5>{{ movies[0]['title'] }}</h5>
+                    <p class="display-5 fw-bold text-warning mb-0">{{ movies[0]['rental_count'] }}</p>
+                    <small class="text-muted">rentals</small>
+                </div>
+            </div>
+        </div>
+        <!-- 3rd Place -->
+        <div class="col-md-3 order-md-3 order-3">
+            <div class="card text-center h-100" style="margin-top: 3rem;">
+                <div class="card-body">
+                    <div class="display-4 mb-2">🥉</div>
+                    <h5>{{ movies[2]['title'] }}</h5>
+                    <p class="display-6 fw-bold text-primary mb-0">{{ movies[2]['rental_count'] }}</p>
+                    <small class="text-muted">rentals</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Full Rankings Table -->
+    <div class="card">
+        <div class="card-header bg-white">
+            <h5 class="mb-0"><i class="bi bi-list-ol"></i> Complete Rankings</h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th style="width: 80px;">Rank</th>
+                            <th>Movie Title</th>
+                            <th style="width: 150px;">Rental Count</th>
+                            <th style="width: 200px;">Popularity</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% set max_count = movies[0]['rental_count'] if movies else 1 %}
+                        {% for movie in movies %}
+                        <tr>
+                            <td>
+                                {% if loop.index == 1 %}
+                                <span class="badge bg-warning text-dark fs-6">#{{ loop.index }}</span>
+                                {% elif loop.index == 2 %}
+                                <span class="badge bg-secondary fs-6">#{{ loop.index }}</span>
+                                {% elif loop.index == 3 %}
+                                <span class="badge bg-danger fs-6">#{{ loop.index }}</span>
+                                {% else %}
+                                <span class="badge bg-light text-dark fs-6">#{{ loop.index }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{{ url_for('movie_detail', movie_id=movie['movie_id']) }}" class="text-decoration-none">
+                                    <i class="bi bi-film"></i> {{ movie['title'] }}
+                                </a>
+                            </td>
+                            <td>
+                                <span class="fw-bold">{{ movie['rental_count'] }}</span>
+                                <small class="text-muted">rentals</small>
+                            </td>
+                            <td>
+                                <div class="progress" style="height: 20px;">
+                                    <div class="progress-bar bg-primary" role="progressbar" 
+                                         style="width: {{ (movie['rental_count'] / max_count * 100)|int }}%">
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+        <i class="bi bi-bar-chart text-muted" style="font-size: 4rem;"></i>
+        <h4 class="mt-3 text-muted">No Rental Data</h4>
+        <p class="text-muted">There are no rental records yet. Start renting movies to see analytics!</p>
+        <a href="{{ url_for('rent_movie') }}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Process a Rental
+        </a>
+    </div>
+    {% endif %}
+
+    <!-- Report Note -->
+    <div class="card mt-4 bg-light">
+        <div class="card-body">
+            <p class="mb-0 text-muted">
+                <i class="bi bi-info-circle"></i>
+                <strong>About this report:</strong> This report uses SQL aggregation (GROUP BY, COUNT) to analyze 
+                rental patterns and identify the most popular movies in our inventory.
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}
