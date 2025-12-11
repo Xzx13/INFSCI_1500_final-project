@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+
+{% block title %}Add New Movie - Movie Rental System{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="container">
+        <h1><i class="bi bi-plus-circle"></i> Add New Movie</h1>
+        <p class="lead mb-0">Add a new movie to the rental catalog</p>
+    </div>
+</div>
+
+<div class="container pb-5">
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <div class="card-body p-4">
+                    <form method="POST">
+                        <h5 class="mb-3"><i class="bi bi-film"></i> Movie Information</h5>
+                        
+                        <div class="row">
+                            <div class="col-md-8 mb-3">
+                                <label for="title" class="form-label">Title <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="title" name="title" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="release_year" class="form-label">Release Year</label>
+                                <input type="number" class="form-control" id="release_year" name="release_year" min="1900" max="2030">
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="mpaa_rating" class="form-label">MPAA Rating</label>
+                                <select class="form-select" id="mpaa_rating" name="mpaa_rating">
+                                    <option value="">-- Select --</option>
+                                    <option value="G">G</option>
+                                    <option value="PG">PG</option>
+                                    <option value="PG-13">PG-13</option>
+                                    <option value="R">R</option>
+                                    <option value="NC-17">NC-17</option>
+                                    <option value="TV-MA">TV-MA</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="length_minutes" class="form-label">Length (minutes)</label>
+                                <input type="number" class="form-control" id="length_minutes" name="length_minutes" min="1">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="movie_rating" class="form-label">Rating (0-10)</label>
+                                <input type="number" class="form-control" id="movie_rating" name="movie_rating" min="0" max="10" step="0.1">
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                        </div>
+                        
+                        <hr>
+                        <h5 class="mb-3"><i class="bi bi-tags"></i> Categories</h5>
+                        <div class="row mb-3">
+                            {% for category in categories %}
+                            <div class="col-md-4 col-6">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="categories" value="{{ category.category_id }}" id="cat_{{ category.category_id }}">
+                                    <label class="form-check-label" for="cat_{{ category.category_id }}">
+                                        {{ category.category_name }}
+                                    </label>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <hr>
+                        <h5 class="mb-3"><i class="bi bi-people"></i> Actors</h5>
+                        <div class="mb-3">
+                            <select class="form-select" id="actors" name="actors" multiple size="6">
+                                {% for actor in actors %}
+                                <option value="{{ actor.actor_id }}">{{ actor.actor_name }}</option>
+                                {% endfor %}
+                            </select>
+                            <small class="text-muted">Hold Ctrl/Cmd to select multiple actors</small>
+                        </div>
+                        
+                        <hr>
+                        <h5 class="mb-3"><i class="bi bi-currency-dollar"></i> Pricing</h5>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="rental_rate" class="form-label">Rental Rate ($)</label>
+                                <input type="number" class="form-control" id="rental_rate" name="rental_rate" value="4.99" min="0" step="0.01">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="late_fee" class="form-label">Late Fee ($/day)</label>
+                                <input type="number" class="form-control" id="late_fee" name="late_fee" value="1.00" min="0" step="0.01">
+                            </div>
+                        </div>
+                        
+                        <hr>
+                        <h5 class="mb-3"><i class="bi bi-box-seam"></i> Inventory</h5>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="num_copies" class="form-label">Number of Copies</label>
+                                <input type="number" class="form-control" id="num_copies" name="num_copies" value="3" min="1" max="20">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="store_location" class="form-label">Store Location</label>
+                                <select class="form-select" id="store_location" name="store_location">
+                                    <option value="Front Shelf">Front Shelf</option>
+                                    <option value="Back Shelf">Back Shelf</option>
+                                    <option value="Kids Section">Kids Section</option>
+                                    <option value="New Releases">New Releases</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <hr>
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-plus-circle"></i> Add Movie
+                            </button>
+                            <a href="{{ url_for('browse_movies') }}" class="btn btn-outline-secondary btn-lg">
+                                <i class="bi bi-x-circle"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card shadow">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-lightbulb"></i> Tips</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="mb-0">
+                        <li>Only the <strong>Title</strong> is required</li>
+                        <li>MPAA ratings help customers find appropriate content</li>
+                        <li>Movie rating is on a scale of 0-10</li>
+                        <li>Select one or more categories for better searchability</li>
+                        <li>Adding inventory copies makes the movie available for rent immediately</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
